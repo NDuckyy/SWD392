@@ -1,0 +1,65 @@
+name: CI/CD Deploy to VPS using Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Clean old source code on VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          port: 22
+          script: |
+            rm -rf /var/www/SWD392-backend
+
+      - name: Copy source code to VPS via SCP
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          port: 22
+          source: "."
+          target: "/var/www/SWD392-backend"
+
+      - name: SSH into VPS and deploy container
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          port: 22
+          script: |
+            cd /var/www/SWD392-backend/SWD392-backend
+
+            # Ghi nội dung .env từ GitHub Secret
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Dừng và xóa container cũ nếu có
+            for name in swd392-api swd392-api-nginx-1 swd392-api-nginx-2 swd392-api-nginx-3; 
+            do
+              docker stop $name || true
+              docker rm $name || true
+            done
+
+            # Build lại Docker image
+            docker build --no-cache -t swd392-api .
+
+            # Chạy container mới (host port 8080 -> container port 5000)
+            # docker run -d --name swd392-api -p 1802:5000 --env-file .env swd392-api
+
+            # Chạy container nginx load balancer test
+            docker run -d --name swd392-api-nginx-1 -p 1802:5000 --env-file .env swd392-api
+            docker run -d --name swd392-api-nginx-2 -p 1803:5000 --env-file .env swd392-api
+            docker run -d --name swd392-api-nginx-3 -p 1804:5000 --env-file .env swd392-api

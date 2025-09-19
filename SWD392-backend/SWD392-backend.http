@@ -1,0 +1,5 @@
+@SWD392_backend_HostAddress = https://localhost:7259
+
+GET {{SWD392_backend_HostAddress}}/api/User/GetAllUser
+Accept: application/json
+###

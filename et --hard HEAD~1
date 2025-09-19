@@ -1,0 +1,144 @@
+[33mcommit c248b5659cecdedea41ff04c244c069e92e8566a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtest[m[33m)[m
+Author: LeHuyVuu <lehuyvuok@gmail.com>
+Date:   Mon May 26 12:31:12 2025 +0700
+
+    cicd 2
+
+[1mdiff --git a/SWD392-backend/Context/MyDbContext.cs b/SWD392-backend/Context/MyDbContext.cs[m
+[1mindex 19a5595..e5b63d5 100644[m
+[1m--- a/SWD392-backend/Context/MyDbContext.cs[m
+[1m+++ b/SWD392-backend/Context/MyDbContext.cs[m
+[36m@@ -34,9 +34,21 @@[m [mpublic partial class MyDbContext : DbContext[m
+ [m
+     public virtual DbSet<user> users { get; set; }[m
+ [m
+[32m+[m
+[32m+[m[41m    [m
+     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)[m
+[31m-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.[m
+[31m-        => optionsBuilder.UseNpgsql("Host=pg-28ce6480-fpt-3666.l.aivencloud.com;Port=13324;Database=defaultdb;Username=avnadmin;Password=AVNS_htWRbMFMZ-CLrxBh7h6");[m
+[32m+[m[32m    {[m
+[32m+[m[32m        if (!optionsBuilder.IsConfigured)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            var connectionString = $"Host={Environment.GetEnvironmentVariable("DB_HOST")};" +[m
+[32m+[m[32m                                   $"Port={Environment.GetEnvironmentVariable("DB_PORT")};" +[m
+[32m+[m[32m                                   $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +[m
+[32m+[m[32m                                   $"Username={Environment.GetEnvironmentVariable("DB_USER")};" +[m
+[32m+[m[32m                                   $"Password={Environment.GetEnvironmentVariable("DB_PASS")};";[m
+[32m+[m
+[32m+[m[32m            optionsBuilder.UseNpgsql(connectionString);[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+ [m
+     protected override void OnModelCreating(ModelBuilder modelBuilder)[m
+     {[m
+[1mdiff --git a/SWD392-backend/obj/Debug/net8.0/SWD392-backend.AssemblyInfo.cs b/SWD392-backend/obj/Debug/net8.0/SWD392-backend.AssemblyInfo.cs[m
+[1mindex dad6150..96bfc5f 100644[m
+[1m--- a/SWD392-backend/obj/Debug/net8.0/SWD392-backend.AssemblyInfo.cs[m
+[1m+++ b/SWD392-backend/obj/Debug/net8.0/SWD392-backend.AssemblyInfo.cs[m
+[36m@@ -13,7 +13,7 @@[m [musing System.Reflection;[m
+ [assembly: System.Reflection.AssemblyCompanyAttribute("SWD392-backend")][m
+ [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")][m
+ [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")][m
+[31m-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+152abf31a860ca1c0b3dc8f81e75146ceef44e98")][m
+[32m+[m[32m[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7f4afd0a1737280a59bceb5912b37044137805f")][m
+ [assembly: System.Reflection.AssemblyProductAttribute("SWD392-backend")][m
+ [assembly: System.Reflection.AssemblyTitleAttribute("SWD392-backend")][m
+ [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")][m
+
+[33mcommit e7f4afd0a1737280a59bceb5912b37044137805f[m
+Author: LeHuyVuu <lehuyvuok@gmail.com>
+Date:   Mon May 26 12:27:08 2025 +0700
+
+    entities
+
+[1mdiff --git a/SWD392-backend/Context/MyDbContext.cs b/SWD392-backend/Context/MyDbContext.cs[m
+[1mnew file mode 100644[m
+[1mindex 0000000..19a5595[m
+[1m--- /dev/null[m
+[1m+++ b/SWD392-backend/Context/MyDbContext.cs[m
+[36m@@ -0,0 +1,143 @@[m
+[32m+[m[32m﻿using System;[m
+[32m+[m[32musing System.Collections.Generic;[m
+[32m+[m[32musing Microsoft.EntityFrameworkCore;[m
+[32m+[m[32musing SWD392_backend.Entities;[m
+[32m+[m
+[32m+[m[32mnamespace SWD392_backend.Context;[m
+[32m+[m
+[32m+[m[32mpublic partial class MyDbContext : DbContext[m
+[32m+[m[32m{[m
+[32m+[m[32m    public MyDbContext()[m
+[32m+[m[32m    {[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public MyDbContext(DbContextOptions<MyDbContext> options)[m
+[32m+[m[32m        : base(options)[m
+[32m+[m[32m    {[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<category> categories { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<order> orders { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<orders_detail> orders_details { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<product> products { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<product_attribute> product_attributes { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<product_image> product_images { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<product_review> product_reviews { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<supplier> suppliers { get; set; }[m
+[32m+[m
+[32m+[m[32m    public virtual DbSet<user> users { get; set; }[m
+[32m+[m
+[32m+[m[32m    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)[m
+[32m+[m[32m#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.[m
+[32m+[m[32m        => optionsBuilder.UseNpgsql("Host=pg-28ce6480-fpt-3666.l.aivencloud.com;Port=13324;Database=defaultdb;Username=avnadmin;Password=AVNS_htWRbMFMZ-CLrxBh7h6");[m
+[32m+[m
+[32m+[m[32m    protected override void OnModelCreating(ModelBuilder modelBuilder)[m
+[32m+[m[32m    {[m
+[32m+[m[32m        modelBuilder.HasPostgresEnum("order_status", new[] { "pending", "preparing", "delivery", "delivered", "returned", "cancelled", "refunding", "refunded" });[m
+[32m+[m
+[32m+[m[32m        modelBuilder.Entity<category>(entity =>[m
+[32m+[m[32m        {[m
+[32m+[m[32m            entity.HasKey(e => e.id).HasName("categories_pkey");[m
+[32m+[m[32m        });[m
+[32m+[m
+[32m+[m[32m        modelBuilder.Entity<order>(entity =>[m
+[32m+[m[32m        {[m
+[32m+[m[32m            entity.HasKey(e => e.id).HasName("orders_pkey");[m
+[32m+[m
+[32m+[m[32m            entity.Property(e => e.id).ValueGeneratedNever();[m
+[32m+[m
+[32m+[m[32m            entity.HasOne(d => d.supplier).WithMany(p => p.orders)[m
+[32m+[m[32m                .OnDelete(DeleteBehavior.ClientSetNull)[m
+[32m+[m[32m                .HasConstraintName("fk_orders_supplier");[m
+[32m+[m
+[32m+[m[32m            entity.HasOne(d => d.user).WithMany(p => p.orders)[m
+[32m+[m[32m                .OnDelete(DeleteBehavior.ClientSetNull)[m
+[32m+[m[32m                .HasConstraintName("fk_orders_user");[m
+[32m+[m[32m        });[m
+[32m+[m
+[32m+[m[32m        modelBuilder.Entity<orders_detail>(entity =>[m
+[32m+[m[32m        {[m
+[32m+[m[32m            entity.HasKey(e => e.id).HasName("orders_detail_pkey");[m
+[32m+[m
+[32m+[m[32m            entity.HasOne(d => d.order).WithMany(p => p.orders_details)[m
+[32m+[m[32m                .OnDelete(DeleteBehavior.ClientSetNull)[m
+[32m+[m[32m                .HasConstraintName("fk_orders_detail_order");[m
+[32m+[m
+[32m+[m[32m            entity.HasOne(d => d.product_attribute).WithMany(p => p.orders_details)[m
+[32m+[m[32m                .OnDelete(DeleteBehavior.ClientSetNull)[m
+[32m+[m[32m                .HasConstraintName("fk_orders_detail_product");[m
+[32m+[m[32m        });[m
+[32m+[m
+[32m+[m[32m        modelBuilder.Entity<product>(entity =>[m
+[32m+[m[32m        {[m
+[32m+[m[32m            entity.HasKey(e => e.id).HasName("products_pkey");[m
+[32m+[m
+[32m+[m[32m            entity.HasOne(d => d.categories).WithMany(p => p.products)[m
+[32m+[m[32m                .OnDelete(DeleteBehavior.ClientSetNull)[m
+[32m+[m[32m                .HasConstraintNa
