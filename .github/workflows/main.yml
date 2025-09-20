@@ -44,7 +44,6 @@ jobs:
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           port: 22
           script: |
-            script: |
             set -e
             APP_DIR="${{ vars.TARGET_DIR }}"
             SERVICE="${{ vars.SERVICE_NAME }}"
