@@ -22,7 +22,7 @@ jobs:
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           port: 22
           script: |
-            rm -rf /var/www/SWD392-backend
+            rm -rf "${{ vars.TARGET_DIR }}"
 
       - name: Copy source code to VPS via SCP
         uses: appleboy/scp-action@v0.1.4
@@ -33,7 +33,7 @@ jobs:
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           port: 22
           source: "."
-          target: "/var/www/SWD392-backend"
+          target: "${{ vars.TARGET_DIR }}"
 
       - name: SSH into VPS and deploy container
         uses: appleboy/ssh-action@v1.0.0
@@ -44,20 +44,24 @@ jobs:
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           port: 22
           script: |
-            cd /var/www/SWD392-backend/SWD392-backend
+            script: |
+            set -e
+            APP_DIR="${{ vars.TARGET_DIR }}"
+            SERVICE="${{ vars.SERVICE_NAME }}"
+
+            cd "$APP_DIR"
 
             # Ghi nội dung .env từ GitHub Secret
-            echo "${{ secrets.ENV_FILE }}" > .env
+            cat > .env <<EOF
+            ${{ secrets.ENV_FILE }}
+            EOF
 
-            # Dừng và xóa container cũ nếu có
-            for name in swd392-api swd392-api-nginx-1 swd392-api-nginx-2 swd392-api-nginx-3; 
-            do
-              docker stop $name || true
-              docker rm $name || true
-            done
+            # Dừng & xóa container cũ (nếu tồn tại)
+            docker stop "$SERVICE" 2>/dev/null || true
+            docker rm "$SERVICE" 2>/dev/null || true
 
-            # Build lại Docker image
-            docker build --no-cache -t swd392-api .
+            # Build lại Docker image (tag theo SERVICE)
+            docker build --no-cache -t "$SERVICE" .
 
-            # Chạy container mới (host port 8080 -> container port 5000)
-            # docker run -d --name swd392-api -p 1802:5000 --env-file .env swd392-api
+            # Chạy 1 container duy nhất, map port 1802 -> 5000
+            docker run -d --name "$SERVICE" -p 1802:5000 --env-file .env "$SERVICE"
