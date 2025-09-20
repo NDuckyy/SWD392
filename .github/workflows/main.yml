@@ -48,7 +48,7 @@ jobs:
             APP_DIR="${{ vars.TARGET_DIR }}"
             SERVICE="${{ vars.SERVICE_NAME }}"
       
-            cd "$APP_DIR"
+            cd "$APP_DIR/SWD392-backend"
       
             # Ghi nội dung .env từ GitHub Secret
             cat > .env <<EOF
