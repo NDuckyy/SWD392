@@ -47,20 +47,20 @@ jobs:
             set -e
             APP_DIR="${{ vars.TARGET_DIR }}"
             SERVICE="${{ vars.SERVICE_NAME }}"
-
+      
             cd "$APP_DIR"
-
+      
             # Ghi nội dung .env từ GitHub Secret
             cat > .env <<EOF
             ${{ secrets.ENV_FILE }}
             EOF
-
+      
             # Dừng & xóa container cũ (nếu tồn tại)
             docker stop "$SERVICE" 2>/dev/null || true
             docker rm "$SERVICE" 2>/dev/null || true
-
+      
             # Build lại Docker image (tag theo SERVICE)
             docker build --no-cache -t "$SERVICE" .
-
+      
             # Chạy 1 container duy nhất, map port 1802 -> 5000
             docker run -d --name "$SERVICE" -p 1802:5000 --env-file .env "$SERVICE"
