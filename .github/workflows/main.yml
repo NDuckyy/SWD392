@@ -61,8 +61,3 @@ jobs:
 
             # Chạy container mới (host port 8080 -> container port 5000)
             # docker run -d --name swd392-api -p 1802:5000 --env-file .env swd392-api
-
-            # Chạy container nginx load balancer test
-            docker run -d --name swd392-api-nginx-1 -p 1802:5000 --env-file .env swd392-api
-            docker run -d --name swd392-api-nginx-2 -p 1803:5000 --env-file .env swd392-api
-            docker run -d --name swd392-api-nginx-3 -p 1804:5000 --env-file .env swd392-api
